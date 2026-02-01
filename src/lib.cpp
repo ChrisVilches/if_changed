@@ -1,5 +1,6 @@
 #include "lib.hpp"
 
+#include <format>
 #include <iostream>
 
 bool get_changed(const std::optional<std::string>& prev_content,
@@ -19,5 +20,5 @@ void print_usage() {
 }
 
 std::string get_full_file_path(const std::string& key) {
-  return format("/tmp/if_changed_{}", key);
+  return std::format("/tmp/if_changed_{}", key);
 }

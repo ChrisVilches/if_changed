@@ -3,9 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-// TODO: remove this
-std::optional<std::string> read_file(const std::string& path, const int x) {
-  std::cout << "remove this " << x << std::endl;
+std::optional<std::string> read_file(const std::string& path) {
   std::ifstream f(path, std::ios::binary);
   if (!f) {
     return std::nullopt;
