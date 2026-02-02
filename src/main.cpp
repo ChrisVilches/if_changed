@@ -6,7 +6,8 @@
 
 int main(const int argc, const char* const argv[]) {
   if (argc != 2) {
-    std::cerr << std::format("needs a unique key to identify the content\n\n", argc);
+    std::cerr << std::format(
+        "needs a unique key to identify the content (got {} arguments)\n\n", argc - 1);
     print_usage();
     return 2;
   }
