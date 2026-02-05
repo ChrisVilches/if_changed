@@ -10,33 +10,35 @@ It stores previous content in `/tmp/if_changed_<key>` and returns exit code 0 wh
 changed, 1 when unchanged (or vice versa). Used in shell pipelines to conditionally run
 commands when input changes.
 
-- **Language**: C++20 (C++23 in clangd configuration)
-- **Build system**: GNU Make
-- **Dependencies**: Standard library only
+- **Language**: C++23 (CMake configuration)
+- **Build system**: CMake with GoogleTest for testing
+- **Dependencies**: Standard library + GoogleTest for tests
 - **Platform**: Unix-like (uses `/tmp`)
 
 ## Build Commands
 
-### Basic Build
+### CMake Build
 ```bash
-make          # Builds the executable to build/if_changed
-make all      # Same as default target
+# Configure and build in a separate directory (recommended)
+cmake -B build -S . -DCMAKE_CXX_COMPILER=g++
+cmake --build build --target all -j4
+
+# Or configure once, then build repeatedly
+mkdir -p build && cd build
+cmake -DCMAKE_CXX_COMPILER=g++ ..
+make -j4
+```
+
+### Build Specific Targets
+```bash
+cmake --build build --target if_changed      # Main executable only
+cmake --build build --target if_changed_tests # Test suite only
 ```
 
 ### Clean Build
 ```bash
-make clean    # Removes the build directory
+rm -rf build  # Remove CMake build directory
 ```
-
-### Manual Compilation (for reference)
-```bash
-g++ -std=c++20 -Wall -Wextra -I./src -c src/main.cpp -o build/main.o
-g++ -std=c++20 -Wall -Wextra -I./src -c src/io.cpp -o build/io.o
-g++ -std=c++20 -Wall -Wextra -I./src -c src/lib.cpp -o build/lib.o
-g++ build/*.o -o build/if_changed
-```
-
-**Note:** The Makefile uses C++20, while `.clangd` uses C++23. For consistency, new code should compile with both standards.
 
 ### Running the Program
 ```bash
@@ -78,8 +80,17 @@ Always ensure new code compiles without warnings under these flags.
 
 ## Testing
 
-**No unit test suite is currently implemented.** The TODO list includes "add unit tests".
-When adding tests, consider using a lightweight framework like Catch2 or Google Test.
+**Unit test suite is implemented using GoogleTest.** Tests are located in `tests/` directory.
+
+### Running Tests
+```bash
+# Build and run tests with ctest
+cmake --build build --target if_changed_tests
+cd build && ctest --verbose
+
+# Or run test executable directly
+./build/if_changed_tests
+```
 
 ### Manual Testing
 Test the program manually with different inputs and keys:
@@ -188,13 +199,13 @@ No `.cursorrules` or `.github/copilot-instructions.md` files exist. However, age
 
 ### Development Workflow
 1. Make changes to source files in `src/`
-2. Run `make` to rebuild
-3. Test manually with sample commands
+2. Run `cmake --build build` to rebuild
+3. Test manually with sample commands and run tests with `./build/if_changed_tests`
 4. Format code with `clang-format`
 5. Commit changes
 
 ### Future Considerations
-- Add unit tests with Catch2
+- Improve test coverage
 - Implement proper error handling for file operations
 - Add key validation
 - Consider persistent storage location (not just `/tmp`)
@@ -204,8 +215,8 @@ No `.cursorrules` or `.github/copilot-instructions.md` files exist. However, age
 
 | Command | Purpose |
 |---------|---------|
-| `make` | Build executable |
-| `make clean` | Remove build artifacts |
+| `cmake --build build` | Build executable |
+| `rm -rf build` | Remove CMake build directory |
 | `clang-format -i src/*.cpp src/*.hpp` | Format code |
 | `echo "content" \| ./build/if_changed key` | Test program |
 
