@@ -15,7 +15,8 @@ int main(const int argc, const char* const argv[]) {
   const std::optional<std::string> key = parse_key(argv[1]);
   if (!key.has_value()) {
     std::cerr << std::format(
-        "key should be non-empty alphanumeric (can contain dash and underscore)\n");
+        "key should be non-empty alphanumeric (can contain dash and underscore)\n\n");
+    print_usage();
     return 2;
   }
   const std::string file_path = get_full_file_path(key.value());
