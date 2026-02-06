@@ -1,222 +1,208 @@
-# Agent Guidelines for if_changed
+# AGENTS.md - Development Guide for if_changed
 
-This document provides guidelines for AI agents working on the `if_changed` C++ project.
-It covers build commands, code style, testing, and repository conventions.
+This file provides instructions for agentic coding agents working on the `if_changed` repository.
+It contains build commands, test instructions, and code style guidelines.
 
-## Project Overview
+## Build System
 
-`if_changed` is a small command-line utility that tracks changes in piped input.
-It stores previous content in `/tmp/if_changed_<key>` and returns exit code 0 when content
-changed, 1 when unchanged (or vice versa). Used in shell pipelines to conditionally run
-commands when input changes.
+The project uses **CMake** with C++23.
 
-- **Language**: C++23 (CMake configuration)
-- **Build system**: CMake with GoogleTest for testing
-- **Dependencies**: Standard library + GoogleTest for tests
-- **Platform**: Unix-like (uses `/tmp`)
+### Prerequisites
+- CMake ≥ 3.16
+- C++ compiler with C++23 support (g++ or clang++)
+- Google Test (for testing)
 
-## Build Commands
+### Configure and Build
 
-### CMake Build
 ```bash
-# Configure and build in a separate directory (recommended)
+# Configure with g++ (default)
 cmake -B build -S . -DCMAKE_CXX_COMPILER=g++
-cmake --build build --target all -j4
 
-# Or configure once, then build repeatedly
-mkdir -p build && cd build
-cmake -DCMAKE_CXX_COMPILER=g++ ..
-make -j4
+# Build all targets
+cmake --build build --target all -j$(nproc)
+
+# Build only the main executable
+cmake --build build --target if_changed
+
+# Build only the test executable
+cmake --build build --target if_changed_tests
 ```
 
-### Build Specific Targets
+### Clean
+
 ```bash
-cmake --build build --target if_changed      # Main executable only
-cmake --build build --target if_changed_tests # Test suite only
+rm -rf build   # Remove the build directory
 ```
-
-### Clean Build
-```bash
-rm -rf build  # Remove CMake build directory
-```
-
-### Running the Program
-```bash
-# Example usage
-echo "new content" | ./build/if_changed mykey && echo "changed"
-```
-
-## Linting and Formatting
-
-### Code Formatting with clang-format
-The project uses a `.clang-format` file based on Google style with modifications:
-
-- **BasedOnStyle**: Google
-- **ColumnLimit**: 90
-- **PointerAlignment**: Left
-- **DerivePointerAlignment**: false
-
-Format all source files:
-```bash
-clang-format -i src/*.cpp src/*.hpp
-```
-
-### Linting with clang-tidy
-No `.clang-tidy` configuration exists yet, but the `.clangd` file enforces strict warnings.
-Manual linting can be done with:
-```bash
-clang-tidy src/*.cpp -- -std=c++20 -I./src
-```
-
-### Compiler Warnings
-The `.clangd` configuration enables these flags (should be mirrored in any new compilation):
-```
--std=c++23 -Wall -Wextra -Werror -pedantic -Wconversion -Wshadow -Wnon-virtual-dtor
--Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic
--Wnull-dereference -Wdouble-promotion -Wformat=2
-```
-
-Always ensure new code compiles without warnings under these flags.
 
 ## Testing
 
-**Unit test suite is implemented using GoogleTest.** Tests are located in `tests/` directory.
+The project uses **Google Test** (GTest). Tests are located in `tests/`.
 
-### Running Tests
+### Run All Tests
+
 ```bash
-# Build and run tests with ctest
-cmake --build build --target if_changed_tests
 cd build && ctest --verbose
-
-# Or run test executable directly
+# or run the test executable directly
 ./build/if_changed_tests
 ```
 
-### Manual Testing
-Test the program manually with different inputs and keys:
+### Run a Single Test
+
+Use the `--gtest_filter` flag to run specific test cases:
+
 ```bash
-# First run (no previous content) should indicate change
-echo "hello" | ./build/if_changed testkey; echo $?
-# Should output 0 (changed)
-
-# Same content should indicate no change
-echo "hello" | ./build/if_changed testkey; echo $?
-# Should output 1 (same)
-
-# Different content should indicate change
-echo "world" | ./build/if_changed testkey; echo $?
-# Should output 0 (changed)
+./build/if_changed_tests --gtest_filter="GetChangedTest.*"
+./build/if_changed_tests --gtest_filter="GetChangedTest.NoPreviousContentReturnsTrue"
 ```
+
+### Add New Tests
+
+- Place test files in the `tests/` directory.
+- Follow the existing naming pattern: `*_test.cpp`.
+- Use `TEST(SuiteName, TestName)` macros.
+- Include the relevant headers (`lib.hpp`, `io.hpp`).
+- Link against GTest as shown in `CMakeLists.txt`.
+
+## Linting and Formatting
+
+### Clang‑Format
+
+The code style is defined in `.clang-format` (based on **Google style** with a 90‑column limit and left pointer alignment).
+
+To format all source files:
+
+```bash
+# Format everything in src/ and tests/
+find src tests -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
+```
+
+You can also run a dry‑run to see what would change:
+
+```bash
+find src tests -name "*.cpp" -o -name "*.hpp" | xargs clang-format --dry-run -Werror
+```
+
+### Compiler Warnings
+
+The project enforces strict warnings (see `.clangd`). The main flags are:
+
+```
+-std=c++23 -Wall -Wextra -Werror -pedantic -Wconversion -Wshadow
+-Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused
+-Woverloaded-virtual -Wpedantic -Wnull-dereference -Wdouble-promotion -Wformat=2
+```
+
+All warnings are treated as errors. Ensure your changes compile without warnings.
 
 ## Code Style Guidelines
 
-### File Organization
-- Header files: `.hpp` extension, source files: `.cpp` extension
-- Header guards: Use `#pragma once` (preferred over `#ifndef`)
-- Place public interface in headers, implementation in source files
-- Keep functions small and focused
+### General Principles
+- **KISS** – Keep it simple and straightforward.
+- **Explicit over implicit** – Prefer clear, readable code.
+- **Fail fast** – Validate inputs early and throw/return errors promptly.
+- **Use standard C++23** – Leverage modern C++ features where appropriate.
 
-### Includes Order
-1. Standard library headers
-2. Project headers
-3. Third-party headers (none currently)
+### Naming Conventions
+- **Functions and variables**: `snake_case`  
+  Example: `get_changed`, `read_stdin`, `prev_content`
+- **Constants and enumerators**: `UPPER_SNAKE_CASE`  
+  Example: `program_name` (global constant), `SAME`, `DIFFERENT`, `DIR_TYPE::LOCAL_STATE`
+- **Types (classes, enums, structs)**: `PascalCase`  
+  Example: `DIR_TYPE`
+- **Files**: `snake_case` with `.cpp`/`.hpp` extensions
 
-Example from `main.cpp`:
+### Header Files
+- Use `#pragma once` as the include guard.
+- Place header comments that describe the module’s purpose.
+- Keep headers minimal; forward declare when possible.
+- Include order:
+  1. Corresponding `.hpp` (if implementing)
+  2. System/standard library headers (`<iostream>`, `<format>`, etc.)
+  3. Other project headers (`"lib.hpp"`, `"io.hpp"`)
+
+### Source Files
+- Implement functions declared in the matching `.hpp`.
+- Use `const` and `constexpr` liberally.
+- Prefer `std::optional` for functions that may fail or return “no value”.
+- Throw `std::runtime_error` for unrecoverable errors (e.g., missing environment variable).
+- Use `std::format` for string formatting; avoid `printf`‑style functions.
+
+### Error Handling
+- For functions that can fail, return `std::optional<T>` or a `Result`‑like type (currently `std::optional`).
+- Use exceptions only for truly exceptional conditions (e.g., missing `HOME` environment variable).
+- Validate user input early and print helpful error messages to `std::cerr`.
+- Exit codes:
+  - `0` (DIFFERENT) – content changed
+  - `1` (SAME) – content unchanged
+  - `2` – usage error (invalid arguments)
+
+### Memory and Resource Management
+- Rely on RAII; avoid manual `new`/`delete`.
+- Use standard containers (`std::string`, `std::vector`, etc.).
+- Pass large parameters by `const std::string&` or `std::string_view` where appropriate.
+- Use `std::filesystem` for file‑system operations.
+
+### Comments and Documentation
+- Use `// TODO:` comments for planned improvements (see existing TODOs in the code).
+- Write concise, meaningful comments that explain **why**, not what.
+- Avoid comment clutter; let the code speak for itself.
+- Update the `README.md` if you change user‑facing behavior.
+
+### Example Code Snippet
+
 ```cpp
+#include "lib.hpp"
+
+#include <filesystem>
 #include <format>
 #include <iostream>
 
-#include "io.hpp"
-#include "lib.hpp"
+bool get_changed(const std::optional<std::string>& prev_content,
+                 const std::string& new_content) {
+  if (!prev_content.has_value()) return true;
+  return prev_content.value() != new_content;
+}
+
+int get_exit_code(const bool changed) { return changed ? DIFFERENT : SAME; }
+
+// Throws std::runtime_error on missing HOME
+std::string get_local_state_dir(const std::string& key) {
+  const char* home = std::getenv("HOME");
+  if (!home) {
+    throw std::runtime_error("HOME environment variable is not set");
+  }
+  const std::string dir = std::format("{}/.local/state/{}", home, program_name);
+  std::filesystem::create_directory(dir);
+  return std::format("{}/{}_{}", dir, program_name, key);
+}
 ```
 
-### Naming Conventions
-- **Functions**: `snake_case` (e.g., `get_changed`, `read_file`)
-- **Variables**: `snake_case` (e.g., `prev_content`, `file_path`)
-- **Constants**: `snake_case` for `constexpr` variables (e.g., `program_name`)
-- **Enums**: UPPER_CASE for enumerators (e.g., `SAME`, `DIFFERENT`)
-- **Types**: `snake_case` (no custom types yet, but follow STL style)
+## Development Workflow
 
-### Error Handling
-- Use `std::optional` for functions that may fail (e.g., `read_file`)
-- Return `std::nullopt` on failure rather than throwing exceptions
-- Print error messages to `std::cerr` with descriptive text
-- Exit codes: 0 for success (content changed), 1 for success (unchanged), 2 for usage error
+1. **Before making changes** run the existing tests to ensure they pass.
+2. **Implement** your feature or fix, adhering to the style guide.
+3. **Format** your code with `clang‑format`.
+4. **Compile** with the full warning set (CMake builds already enforce `-Werror`).
+5. **Run the tests** (both the whole suite and any new tests you added).
+6. **Update documentation** if needed (especially `README.md` and `TODO.md`).
 
-### Const Correctness
-- Use `const` for parameters that aren't modified
-- Use `const` for local variables that don't change after initialization
-- Mark member functions as `const` when they don't modify object state
+## Repository Notes
 
-### Modern C++ Features
-- Prefer `std::format` over string concatenation or printf
-- Use `std::optional` for optional values
-- Use `constexpr` where appropriate
-- Use range-based for loops when iterating
-- Use `auto` when the type is obvious or verbose
-
-### Memory Management
-- No dynamic memory allocation needed currently (uses STL containers)
-- If allocation is needed, prefer RAII types (`std::unique_ptr`, `std::vector`)
-
-### Comments
-- Use `//` for single-line comments
-- Place comments above the code they describe
-- Avoid obvious comments; explain "why" not "what"
-- Mark TODOs with `// TODO: description` (existing TODOs are in code)
-
-## Git Conventions
-
-### Commit Messages
-- Short, descriptive present-tense messages (e.g., "add makefile", "fix formatting issue")
-- No need for lengthy descriptions in this small project
-- Reference issues if they exist
-
-### Branching
-- `main` is the primary branch
-- Feature branches can be used for larger changes
-
-### Ignored Files
-- `build/` directory is in `.gitignore`
-- No other ignored patterns currently
-
-## Cursor and Copilot Rules
-
-No `.cursorrules` or `.github/copilot-instructions.md` files exist. However, agents should:
-
-1. Follow the code style outlined in this document
-2. Use `#pragma once` in header files
-3. Keep functions under 90 columns as per clang-format
-4. Add tests when implementing new features (once test framework is added)
-
-## Additional Notes
-
-### Project State
-- The project is minimal and functional
-- Several TODOs exist in the code (check `lib.hpp`, `io.hpp`, `io.cpp`)
-- Error handling for file I/O and stdin reading is incomplete
-- Key validation is not implemented (should restrict to alphanumeric)
-
-### Development Workflow
-1. Make changes to source files in `src/`
-2. Run `cmake --build build` to rebuild
-3. Test manually with sample commands and run tests with `./build/if_changed_tests`
-4. Format code with `clang-format`
-5. Commit changes
-
-### Future Considerations
-- Improve test coverage
-- Implement proper error handling for file operations
-- Add key validation
-- Consider persistent storage location (not just `/tmp`)
-- Add command-line options (e.g., `--help`, `--version`)
+- No Cursor or Copilot‑specific rules are present.
+- The `.gitignore` excludes the `build/` directory and editor temporary files.
+- The project is small and focused; keep changes minimal and aligned with the original purpose.
 
 ## Quick Reference
 
 | Command | Purpose |
 |---------|---------|
-| `cmake --build build` | Build executable |
-| `rm -rf build` | Remove CMake build directory |
-| `clang-format -i src/*.cpp src/*.hpp` | Format code |
-| `echo "content" \| ./build/if_changed key` | Test program |
+| `cmake -B build -S .` | Configure the project |
+| `cmake --build build --target if_changed` | Build the main program |
+| `./build/if_changed_tests` | Run all unit tests |
+| `./build/if_changed_tests --gtest_filter="Suite.*"` | Run a subset of tests |
+| `find src tests -name "*.cpp" -o -name "*.hpp" \| xargs clang-format -i` | Format all source files |
+| `rm -rf build` | Clean build artifacts |
 
+---
+
+*This guide is intended for automated agents working on the `if_changed` repository. Please follow it to maintain consistency and quality.*
