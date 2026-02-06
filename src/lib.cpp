@@ -22,3 +22,15 @@ void print_usage() {
 std::string get_full_file_path(const std::string& key) {
   return std::format("/tmp/if_changed_{}", key);
 }
+
+std::optional<std::string> parse_key(const std::string& input) {
+  if (input.empty()) {
+    return std::nullopt;
+  }
+  for (char c : input) {
+    if (!std::isalnum(static_cast<unsigned char>(c)) && c != '-' && c != '_') {
+      return std::nullopt;
+    }
+  }
+  return input;
+}

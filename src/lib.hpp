@@ -19,3 +19,5 @@ void print_usage();
 
 // TODO: use a permanent folder to store (should persist after a reboot).
 std::string get_full_file_path(const std::string& key);
+
+std::optional<std::string> parse_key(const std::string& input);

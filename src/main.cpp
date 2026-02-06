@@ -12,8 +12,13 @@ int main(const int argc, const char* const argv[]) {
     return 2;
   }
 
-  const std::string key(argv[1]);
-  const std::string file_path = get_full_file_path(key);
+  const std::optional<std::string> key = parse_key(argv[1]);
+  if (!key.has_value()) {
+    std::cerr << std::format(
+        "key should be non-empty alphanumeric (can contain dash and underscore)\n");
+    return 2;
+  }
+  const std::string file_path = get_full_file_path(key.value());
   const std::optional<std::string> prev_content = read_file(file_path);
   const std::string new_content = read_stdin();
 

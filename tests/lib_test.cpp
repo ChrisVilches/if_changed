@@ -44,3 +44,52 @@ TEST(GetFullFilePathTest, ReturnsCorrectFormat) {
   std::string path = get_full_file_path(key);
   EXPECT_EQ(path, "/tmp/if_changed_mykey");
 }
+
+TEST(ParseKeyTest, ValidAlphanumericReturnsKey) {
+  std::optional<std::string> result = parse_key("abc123");
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), "abc123");
+}
+
+TEST(ParseKeyTest, ValidWithDashAndUnderscoreReturnsKey) {
+  std::optional<std::string> result = parse_key("abc-123_def");
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), "abc-123_def");
+}
+
+TEST(ParseKeyTest, EmptyStringReturnsNullopt) {
+  std::optional<std::string> result = parse_key("");
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(ParseKeyTest, InvalidSymbolReturnsNullopt) {
+  std::optional<std::string> result = parse_key("abc@123");
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(ParseKeyTest, InvalidSpaceReturnsNullopt) {
+  std::optional<std::string> result = parse_key("abc 123");
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(ParseKeyTest, InvalidDotReturnsNullopt) {
+  std::optional<std::string> result = parse_key("abc.123");
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(ParseKeyTest, InvalidSlashReturnsNullopt) {
+  std::optional<std::string> result = parse_key("abc/123");
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(ParseKeyTest, OnlyDashReturnsKey) {
+  std::optional<std::string> result = parse_key("-");
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), "-");
+}
+
+TEST(ParseKeyTest, OnlyUnderscoreReturnsKey) {
+  std::optional<std::string> result = parse_key("_");
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), "_");
+}
