@@ -39,10 +39,17 @@ TEST(GetExitCodeTest, ChangedReturnsDifferent) {
 TEST(GetExitCodeTest, NotChangedReturnsSame) { EXPECT_EQ(get_exit_code(false), SAME); }
 
 // Optional: test get_full_file_path (simple)
-TEST(GetFullFilePathTest, ReturnsCorrectFormat) {
+TEST(GetFullFilePathTest, ReturnsCorrectFormatTemp) {
   std::string key = "mykey";
-  std::string path = get_full_file_path(key);
+  std::string path = get_full_file_path(DIR_TYPE::TMP, key);
   EXPECT_EQ(path, "/tmp/if_changed_mykey");
+}
+
+TEST(GetFullFilePathTest, ReturnsCorrectFormatLocal) {
+  std::string key = "some_key";
+  std::string path = get_full_file_path(DIR_TYPE::LOCAL_STATE, key);
+  const char* home = std::getenv("HOME");
+  EXPECT_EQ(path, std::format("{}/.local/state/if_changed/if_changed_some_key", home));
 }
 
 TEST(ParseKeyTest, ValidAlphanumericReturnsKey) {

@@ -4,6 +4,8 @@
 #include "io.hpp"
 #include "lib.hpp"
 
+inline constexpr const DIR_TYPE default_dir_type = DIR_TYPE::LOCAL_STATE;
+
 int main(const int argc, const char* const argv[]) {
   if (argc != 2) {
     std::cerr << std::format(
@@ -19,7 +21,8 @@ int main(const int argc, const char* const argv[]) {
     print_usage();
     return 2;
   }
-  const std::string file_path = get_full_file_path(key.value());
+
+  const std::string file_path = get_full_file_path(default_dir_type, key.value());
   const std::optional<std::string> prev_content = read_file(file_path);
   const std::string new_content = read_stdin();
 
