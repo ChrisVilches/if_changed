@@ -21,11 +21,6 @@ void print_usage() {
 }
 
 std::string get_local_state_dir(const std::string& key) {
-  // TODO: there are still some validations that need to be done (e.g. what if local/state
-  // doesn't exist, or what if it doesn't have permissions).
-  // since the errors aren't common (if they do happen, the user will do a one-time fix,
-  // so it will start working from then on), just throw runtime_error. That's probably
-  // good enough.
   const char* home = std::getenv("HOME");
   if (!home) {
     throw std::runtime_error("HOME environment variable is not set");

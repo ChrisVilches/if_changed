@@ -5,6 +5,7 @@ CompileFlags:
     - -Wextra
     - -Werror
     - -pedantic
+    - -Wunreachable-code
     - -Wconversion
     - -Wshadow
     - -Wnon-virtual-dtor
