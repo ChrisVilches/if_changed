@@ -38,7 +38,6 @@ TEST(GetExitCodeTest, ChangedReturnsDifferent) {
 
 TEST(GetExitCodeTest, NotChangedReturnsSame) { EXPECT_EQ(get_exit_code(false), SAME); }
 
-// Optional: test get_full_file_path (simple)
 TEST(GetFullFilePathTest, ReturnsCorrectFormatTemp) {
   std::string key = "mykey";
   std::string path = get_full_file_path(DIR_TYPE::TMP, key);
