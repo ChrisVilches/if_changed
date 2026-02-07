@@ -5,8 +5,8 @@ A minimal command-line utility that tracks changes in piped input. Stores previo
 ## Build
 
 ```bash
-# Configure with CMake
-cmake -B build -S . -DCMAKE_CXX_COMPILER=g++
+# Configure with CMake (Neovim LSP will read the flags in the generated files)
+cmake -B build -S . -DCMAKE_CXX_COMPILER=g++ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # Build everything
 cmake --build build --target all -j4
