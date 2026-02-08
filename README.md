@@ -5,7 +5,7 @@ A minimal command-line utility that tracks changes in piped input. Stores previo
 ## Build
 
 ```bash
-# Configure with CMake (Neovim LSP will read the flags in the generated files)
+# Configure with CMake (generated files contain settings for LSP, which will be read automatically by clangd)
 cmake -B build -S . -DCMAKE_CXX_COMPILER=g++ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # Build everything
