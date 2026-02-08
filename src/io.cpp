@@ -3,11 +3,6 @@
 #include <fstream>
 #include <iostream>
 
-// TODO: not sure if other resources should be closed properly before crashing like this.
-// This looks a bit too abrupt, or no? Should I return result<t,e> like in Rust and handle
-// everything in the main?
-// or maybe a decent way to handle this problem is to simply catch any exception from the
-// main but is that good enough? is it too slow? any performance cost?
 [[noreturn]] void handle_filesystem_errno(const std::string& path) {
   if (errno == ENOENT)
     throw std::runtime_error(format("File or directory does not exist ({})", path));
