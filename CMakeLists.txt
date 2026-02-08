@@ -33,6 +33,7 @@ add_executable(if_changed
   src/main.cpp
   src/lib.cpp
   src/io.cpp
+  src/cli.cpp
 )
 
 target_include_directories(if_changed PRIVATE src)
