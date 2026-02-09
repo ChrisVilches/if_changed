@@ -1,0 +1,18 @@
+CompileFlags:
+  Add:
+    - -std=c++23
+    - -Wall
+    - -Wextra
+    - -Werror
+    - -pedantic
+    - -Wconversion
+    - -Wshadow
+    - -Wnon-virtual-dtor
+    - -Wold-style-cast
+    - -Wcast-align
+    - -Wunused
+    - -Woverloaded-virtual
+    - -Wpedantic
+    - -Wnull-dereference
+    - -Wdouble-promotion
+    - -Wformat=2
