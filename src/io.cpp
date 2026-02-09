@@ -29,7 +29,6 @@ std::string read_stdin() {
 void write_file(const std::string& path, const std::string& data) {
   std::ofstream f(path, std::ios::binary);
   if (!f) {
-    // TODO: not yet tested.
     handle_filesystem_errno(path);
   }
   f << data;
