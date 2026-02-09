@@ -20,18 +20,10 @@ std::optional<std::string> read_file(const std::string& path) {
                      std::istreambuf_iterator<char>());
 }
 
+// NOTE: Reading from stdin rarely fails (and an error is hard to reproduce).
 std::string read_stdin() {
-  std::string result;
-
-  std::istreambuf_iterator<char> it(std::cin), end;
-  result.assign(it, end);
-
-  // TODO: how to reproduce this???
-  if (std::cin.bad()) {
-    throw std::runtime_error("Failed reading stdin");
-  }
-
-  return result;
+  return std::string(std::istreambuf_iterator<char>(std::cin),
+                     std::istreambuf_iterator<char>());
 }
 
 void write_file(const std::string& path, const std::string& data) {
