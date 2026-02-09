@@ -3,6 +3,9 @@
 #include <fstream>
 #include <iostream>
 
+// TODO: this isn't very good, since we don't know what was the problem (read permission?
+// write permission? execution?). It's necessary to tell the user in what situation the
+// error happened.
 [[noreturn]] void handle_filesystem_errno(const std::string& path) {
   if (errno == ENOENT)
     throw std::runtime_error(format("File or directory does not exist ({})", path));
