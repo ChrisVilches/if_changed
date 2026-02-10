@@ -3,18 +3,30 @@
 #include <fstream>
 #include <iostream>
 
-// TODO: this isn't very good, since we don't know what was the problem (read permission?
-// write permission? execution?). It's necessary to tell the user in what situation the
-// error happened.
-[[noreturn]] void handle_filesystem_errno(const std::string& path) {
+enum class Operation { Read, Write, Execute };
+
+const char* operation_to_str(const Operation op) {
+  switch (op) {
+    case Operation::Read:
+      return "read";
+    case Operation::Write:
+      return "write";
+    case Operation::Execute:
+      return "execute";
+  }
+}
+
+[[noreturn]] void handle_filesystem_errno(const std::string& path, const Operation op) {
   std::string msg;
 
+  const char* op_str = operation_to_str(op);
+
   if (errno == ENOENT) {
-    msg = format("File or directory does not exist ({})", path);
+    msg = format("File or directory does not exist ({}): {}", op_str, path);
   } else if (errno == EACCES) {
-    msg = format("Permission denied ({})", path);
+    msg = format("Permission denied ({}): {}", op_str, path);
   } else {
-    msg = format("Unexpected open error ({})", path);
+    msg = format("Unexpected open error ({}): {}", op_str, path);
   }
 
   throw std::runtime_error(msg);
@@ -24,7 +36,7 @@ std::optional<std::string> read_file(const std::string& path) {
   std::ifstream f(path, std::ios::binary);
   if (!f) {
     if (errno == ENOENT) return std::nullopt;
-    handle_filesystem_errno(path);
+    handle_filesystem_errno(path, Operation::Read);
   }
   return std::string((std::istreambuf_iterator<char>(f)),
                      std::istreambuf_iterator<char>());
@@ -39,7 +51,7 @@ std::string read_stdin() {
 void write_file(const std::string& path, const std::string& data) {
   std::ofstream f(path, std::ios::binary);
   if (!f) {
-    handle_filesystem_errno(path);
+    handle_filesystem_errno(path, Operation::Write);
   }
   f << data;
 }
