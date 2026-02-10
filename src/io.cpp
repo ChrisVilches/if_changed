@@ -1,5 +1,6 @@
 #include "io.hpp"
 
+#include <format>
 #include <fstream>
 #include <iostream>
 
@@ -23,11 +24,11 @@ const char* operation_to_str(const Operation op) {
   const char* op_str = operation_to_str(op);
 
   if (errno == ENOENT) {
-    msg = format("File or directory does not exist ({}): {}", op_str, path);
+    msg = std::format("File or directory does not exist ({}): {}", op_str, path);
   } else if (errno == EACCES) {
-    msg = format("Permission denied ({}): {}", op_str, path);
+    msg = std::format("Permission denied ({}): {}", op_str, path);
   } else {
-    msg = format("Unexpected open error ({}): {}", op_str, path);
+    msg = std::format("Unexpected open error ({}): {}", op_str, path);
   }
 
   throw std::runtime_error(msg);
