@@ -1,9 +1,8 @@
 # if_changed
 
-A minimal command-line utility that tracks changes in piped input. Stores
-previous content in `~/.local/state/if_changed/if_changed_<key>` (XDG State
-directory) and returns exit code 0 when content changed, 1 when unchanged.
-Useful in shell pipelines to conditionally run commands when input changes.
+A minimal command-line utility that tracks changes in content identified by a key.
+Returns exit code 0 when content changed, 1 when unchanged.
+Useful in shell pipelines to conditionally run commands when content changes.
 
 ## Build
 
