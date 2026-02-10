@@ -16,8 +16,8 @@ CLIArgs::CLIArgs(const int argc, const char* const argv[]) {
 
   const std::optional<std::string> key_opt = parse_key(argv[1]);
   if (!key_opt.has_value()) {
-    throw CLIUsageError(std::format(
-        "key should be non-empty alphanumeric (can contain dash and underscore)"));
+    throw CLIUsageError(
+        "key should be non-empty alphanumeric (can contain dash and underscore)");
   }
 
   this->key = key_opt.value();
