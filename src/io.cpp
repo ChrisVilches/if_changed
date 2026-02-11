@@ -14,6 +14,7 @@ const char* operation_to_str(const Operation op) {
     case Operation::Execute:
       return "execute";
   }
+  __builtin_unreachable();
 }
 
 [[noreturn]] void handle_filesystem_errno(const std::string& path, const Operation op) {
