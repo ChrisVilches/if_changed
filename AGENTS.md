@@ -103,11 +103,11 @@ All warnings are treated as errors. Ensure your changes compile without warnings
 - **Use standard C++23** – Leverage modern C++ features where appropriate.
 
 ### Naming Conventions
-- **Functions and variables**: `snake_case`  
+- **Functions and variables**: `snake_case`
   Example: `get_changed`, `read_stdin`, `prev_content`
-- **Constants and enumerators**: `UPPER_SNAKE_CASE`  
+- **Constants and enumerators**: `UPPER_SNAKE_CASE`
   Example: `program_name` (global constant), `SAME`, `DIFFERENT`, `DIR_TYPE::LOCAL_STATE`
-- **Types (classes, enums, structs)**: `PascalCase`  
+- **Types (classes, enums, structs)**: `PascalCase`
   Example: `DIR_TYPE`
 - **Files**: `snake_case` with `.cpp`/`.hpp` extensions
 
