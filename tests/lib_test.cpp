@@ -32,11 +32,9 @@ TEST(GetChangedTest, EmptyStringDifferent) {
   EXPECT_TRUE(get_changed(prev, new_content));
 }
 
-TEST(GetExitCodeTest, ChangedReturnsDifferent) {
-  EXPECT_EQ(get_exit_code(true), DIFFERENT);
-}
+TEST(GetExitCodeTest, ChangedExitCode) { EXPECT_EQ(get_exit_code(true), 0); }
 
-TEST(GetExitCodeTest, NotChangedReturnsSame) { EXPECT_EQ(get_exit_code(false), SAME); }
+TEST(GetExitCodeTest, SameExitCode) { EXPECT_EQ(get_exit_code(false), 1); }
 
 TEST(GetFullFilePathTest, ReturnsCorrectFormatTemp) {
   std::string key = "mykey";

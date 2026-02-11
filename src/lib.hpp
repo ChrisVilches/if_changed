@@ -4,10 +4,6 @@
 #include <string>
 
 inline constexpr const char* program_name = "if_changed";
-enum {
-  SAME = 1,
-  DIFFERENT = 0,
-};
 
 enum DIR_TYPE { TMP, LOCAL_STATE };
 

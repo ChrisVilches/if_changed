@@ -4,6 +4,11 @@
 #include <format>
 #include <iostream>
 
+enum {
+  SAME = 1,
+  DIFFERENT = 0,
+};
+
 bool get_changed(const std::optional<std::string>& prev_content,
                  const std::string& new_content) {
   if (!prev_content.has_value()) return true;
