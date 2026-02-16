@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <format>
+
 TEST(GetChangedTest, NoPreviousContentReturnsTrue) {
   std::optional<std::string> prev = std::nullopt;
   std::string new_content = "hello";
